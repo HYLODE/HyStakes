@@ -15,4 +15,9 @@ make dev_mac_os_first_run
 direnv allow
 ```
 
+### Development work
+
+- Open VSCode in the hystakes directory
+- You may(?) need to specify the Python kernel. This should be the one from the *hystakes* conda environment.
+- Navigate to the example files and confirm that they render correctly by following the [Quarto instructions for VSCode](https://quarto.org/docs/get-started/hello/vscode.html)
 
