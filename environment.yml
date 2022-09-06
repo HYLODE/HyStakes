@@ -8,6 +8,7 @@ channels:
 dependencies:
   - arrow=1.2.2
   - jupyterlab
+  - matplotlib
   - numpy>=1.22.3
   - orjson
   - pandas>=1.1.4

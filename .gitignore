@@ -1,2 +1,9 @@
 .env
 secret*
+
+# drop crud from quarto preview
+# only keep qmd, md, and ipynb 
+examples/*
+!examples/*.qmd
+!examples/*.ipynb
+!examples/*.md
