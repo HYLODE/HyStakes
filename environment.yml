@@ -1,0 +1,23 @@
+# run this file from project root
+# first run
+# conda env create -f environment.yml
+# conda env update --file environment.yml --prune
+name: hystakes
+channels:
+  - conda-forge
+dependencies:
+  - arrow=1.2.2
+  - jupyterlab
+  - numpy>=1.22.3
+  - orjson
+  - pandas>=1.1.4
+  - pip
+  - plotly=5.8.0
+  - pytest
+  - python=3.9
+  - requests=2.27.1
+  - toml
+  # pip only (non conda libs here)
+  - pip:
+      - empiricaldist  
+prefix: /opt/homebrew/Caskroom/miniforge/base/envs/hystakes
