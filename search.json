@@ -1,0 +1,44 @@
+[
+  {
+    "objectID": "vignettes/hello-world.html",
+    "href": "vignettes/hello-world.html",
+    "title": "HyStakes",
+    "section": "",
+    "text": "Use this to confirm that your set-up is working. It should open and run from within VSCode, and it should be using the hystakes kernel.\n\nprint('Hello World!')\n\nHello World!"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "HyStakes",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+  },
+  {
+    "objectID": "index.html#section-1",
+    "href": "index.html#section-1",
+    "title": "HyStakes",
+    "section": "Section 1",
+    "text": "Section 1\nsome text"
+  },
+  {
+    "objectID": "index.html#section-2",
+    "href": "index.html#section-2",
+    "title": "HyStakes",
+    "section": "Section 2",
+    "text": "Section 2\nsome more text"
+  },
+  {
+    "objectID": "vignettes/vignettes.html",
+    "href": "vignettes/vignettes.html",
+    "title": "Vignettes",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nTitle\n\n\nAuthor\n\n\n\n\n\n\nExample Jupyter Notebook\n\n\n\n\n\n\n\n\nNo matching items"
+  }
+]
