@@ -1,6 +1,14 @@
 Running notes to keep track of activity
 And then lift parts of these out into guides
 
+
+## 2022-09-07
+
+Setting up website
+https://quarto.org/docs/websites/
+
+
+
 ## 2022-09-06
 
 Working from MacBook Air (M2, 2022) 

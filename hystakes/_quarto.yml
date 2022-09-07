@@ -1,0 +1,32 @@
+project:
+  type: website
+  render:
+    - "!scratch/"
+    - "vignettes/*.ipynb"
+    - "*.qmd"
+    - "*.md"
+    - "*.ipynb"
+
+execute: 
+  freeze: auto
+
+website:
+  title: "HyStakes"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: vignettes/vignettes.qmd
+        text: Vignettes
+      - about.qmd
+  repo-url: https://github.com/hylode/hystakes
+  repo-actions: [edit, issue]
+  repo-subdir: hystakes
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+

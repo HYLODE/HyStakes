@@ -17,3 +17,6 @@ jupyter:
 preview:
 	quarto preview hystakes
 
+render:
+	cd hystakes && quarto render
+	open hystakes/_site/index.html

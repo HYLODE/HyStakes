@@ -7,3 +7,6 @@ examples/*
 !examples/*.qmd
 !examples/*.ipynb
 !examples/*.md
+
+hystakes/.quarto/
+hystakes/_site/

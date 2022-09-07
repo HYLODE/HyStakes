@@ -1,0 +1,15 @@
+---
+title: "HyStakes"
+---
+
+This is a Quarto website.
+
+To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+
+## Section 1
+
+some text
+
+## Section 2
+
+some more text
