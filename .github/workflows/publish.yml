@@ -20,6 +20,8 @@ jobs:
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
+          path: hystakes
+          # path: source-folder # By default, the current working dir is used i.e `quarto render .`
           target: gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
