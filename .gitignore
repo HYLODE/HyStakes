@@ -1,5 +1,7 @@
 .env
 secret*
+*.swp
+*-checkpoint.*
 
 # drop crud from quarto preview
 # only keep qmd, md, and ipynb 
@@ -10,5 +12,5 @@ examples/*
 
 hystakes/.quarto/
 hystakes/_site/
-hystakes/docs/
-/docs/
+
+scratch/
