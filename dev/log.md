@@ -6,6 +6,9 @@ And then lift parts of these out into guides
 
 Setting up website
 https://quarto.org/docs/websites/
+all done 
+uses github actions and gh-pages
+deployed at https://hylode.github.io/HyStakes/
 
 
 

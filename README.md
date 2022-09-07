@@ -35,3 +35,5 @@ quarto preview
 ```
 
 The live preview will not show global changes. You must run `quarto render` to see the site before you deploy.
+
+The actual site is automatically built using github actions. Anything pushed to the **main** branch will be rendered (as per the rules in `./hystakes/_quarto.yml`) and published to https://hylode.github.io/HyStakes/. Note that the **main** branch is protected and so a pull request will need to be created and approve before the site can be built. Guidance on this can be found at [The Turing Way](https://the-turing-way.netlify.app/collaboration/maintain-review.html), and this [tutorial](https://yangsu.github.io/pull-request-tutorial/).
