@@ -2,7 +2,8 @@
   {
     "listing": "/vignettes/vignettes.html",
     "items": [
-      "/vignettes/hello-world.html"
+      "/vignettes/hello-world.html",
+      "/vignettes/uclh-working-with-star.html"
     ]
   }
 ]
