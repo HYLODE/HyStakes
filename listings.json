@@ -3,6 +3,7 @@
     "listing": "/vignettes/vignettes.html",
     "items": [
       "/vignettes/hello-world.html",
+      "/vignettes/prepare-synthetic-data.html",
       "/vignettes/uclh-working-with-star.html"
     ]
   }
