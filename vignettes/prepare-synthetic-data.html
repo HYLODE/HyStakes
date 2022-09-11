@@ -172,6 +172,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#prepare-synthetic-data" id="toc-prepare-synthetic-data" class="nav-link active" data-scroll-target="#prepare-synthetic-data">Prepare synthetic data</a>
   <ul class="collapse">
   <li><a href="#load-environment-variables" id="toc-load-environment-variables" class="nav-link" data-scroll-target="#load-environment-variables">Load environment variables</a></li>
+  <li><a href="#prepare-the-live-query" id="toc-prepare-the-live-query" class="nav-link" data-scroll-target="#prepare-the-live-query">Prepare the ‘live’ query</a></li>
+  <li><a href="#simulatefake-each-field" id="toc-simulatefake-each-field" class="nav-link" data-scroll-target="#simulatefake-each-field">Simulate/fake each field</a>
+  <ul class="collapse">
+  <li><a href="#hours-to-discharge" id="toc-hours-to-discharge" class="nav-link" data-scroll-target="#hours-to-discharge">Hours to discharge</a></li>
+  <li><a href="#department" id="toc-department" class="nav-link" data-scroll-target="#department">Department</a></li>
+  <li><a href="#age" id="toc-age" class="nav-link" data-scroll-target="#age">Age</a></li>
+  <li><a href="#pulse" id="toc-pulse" class="nav-link" data-scroll-target="#pulse">Pulse</a></li>
+  </ul></li>
+  <li><a href="#prepare-dummy-data-frame" id="toc-prepare-dummy-data-frame" class="nav-link" data-scroll-target="#prepare-dummy-data-frame">Prepare dummy data frame</a></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.dev/hylode/hystakes/blob/main/hystakes/vignettes/prepare-synthetic-data.ipynb" class="toc-action">Edit this page</a></p><p><a href="https://github.com/hylode/hystakes/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
@@ -183,335 +192,569 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="prepare-synthetic-data" class="level1">
 <h1>Prepare synthetic data</h1>
+<ul>
+<li>Steve Harris</li>
+<li>2022-09-11</li>
+</ul>
 <p>We need synthetic data.<br>
 We will inspect live data in this notebook, and then derive a short script that will generate suitable dummy data.</p>
 <p><strong>NOTE</strong></p>
 <p>This notebook will be be run manually.<br>
 That should happen from the <em>project root directory</em> where the <code>readme.md</code> and the <code>.env</code> file are stored.</p>
 <p>The following changes to the project root assuming that the notebook kernel is normally starting from the same directory as the notebook itself.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T22:47:55.078567Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T22:47:55.078248Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T22:47:55.090549Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T22:47:55.089586Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T22:47:55.078496Z&quot;}" data-tags="[]" data-execution_count="1">
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:36:58.980387Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:36:58.979672Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:36:58.992199Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:36:58.991141Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:36:58.980313Z&quot;}" data-tags="[]" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>cd ..<span class="op">/</span>..</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>/data/hymind/home/steve/HyStakes</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T22:52:46.393006Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T22:52:46.392543Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T22:52:47.162436Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T22:52:47.161448Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T22:52:46.392962Z&quot;}" data-tags="[]" data-execution_count="11">
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:36:58.995461Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:36:58.995084Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:01.107025Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:01.106152Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:36:58.995432Z&quot;}" data-tags="[]" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlalchemy <span class="im">as</span> sa</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> poisson, lognorm</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlalchemy <span class="im">as</span> sa</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:01.111585Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:01.111291Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:01.129827Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:01.128798Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:01.111556Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="load-environment-variables" class="level2">
 <h2 class="anchored" data-anchor-id="load-environment-variables">Load environment variables</h2>
 <p>Load environment variables and set-up SQLAlchemy connection engine for the EMAP Star</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T22:47:56.292720Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T22:47:56.292198Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T22:47:56.298937Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T22:47:56.298114Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T22:47:56.292689Z&quot;}" data-tags="[]" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>load_dotenv(dotenv_path<span class="op">=</span><span class="st">".env"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> os.getenv(<span class="st">"DOTENV_FILE_EXISTS"</span>) <span class="op">==</span> <span class="st">'TRUE'</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AssertionError</span>:</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"!!! ERROR: check that the .env file exists at the top level of the project"</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"!!! ERROR: check that the relative path is correct"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:01.131202Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:01.130899Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:01.138461Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:01.137172Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:01.131173Z&quot;}" data-tags="[]" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>load_dotenv(dotenv_path<span class="op">=</span><span class="st">".env"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> os.getenv(<span class="st">"DOTENV_FILE_EXISTS"</span>) <span class="op">==</span> <span class="st">'TRUE'</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AssertionError</span>:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"!!! ERROR: check that the .env file exists at the top level of the project"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"!!! ERROR: check that the relative path is correct"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T22:47:56.301081Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T22:47:56.300571Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T22:47:56.340769Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T22:47:56.339964Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T22:47:56.301052Z&quot;}" data-tags="[]" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Construct the PostgreSQL connection</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>uds_host <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_HOST'</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>uds_name <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_NAME'</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>uds_port <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_PORT'</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>uds_user <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_USER'</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>uds_passwd <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_PASSWORD'</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>emapdb_engine <span class="op">=</span> sa.create_engine(<span class="ss">f'postgresql://</span><span class="sc">{</span>uds_user<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>uds_passwd<span class="sc">}</span><span class="ss">@</span><span class="sc">{</span>uds_host<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>uds_port<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>uds_name<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:01.140900Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:01.140230Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:01.294023Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:01.285023Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:01.140851Z&quot;}" data-tags="[]" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Construct the PostgreSQL connection</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>uds_host <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_HOST'</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>uds_name <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_NAME'</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>uds_port <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_PORT'</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>uds_user <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_USER'</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>uds_passwd <span class="op">=</span> os.getenv(<span class="st">'EMAP_DB_PASSWORD'</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>emapdb_engine <span class="op">=</span> sa.create_engine(<span class="ss">f'postgresql://</span><span class="sc">{</span>uds_user<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>uds_passwd<span class="sc">}</span><span class="ss">@</span><span class="sc">{</span>uds_host<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>uds_port<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>uds_name<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="prepare-the-live-query" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-the-live-query">Prepare the ‘live’ query</h2>
 <p>Here’s the <em>very</em> long query that I built.<br>
 It selects all patients on tower wards 2 weeks ago (336 hours), and then finds the age (rounded) and the last heart rate. The remaining data has <em>no</em> identifiers.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">left</span>(md5(lv.hospital_visit_id:<span class="ch">:TEXT</span>), <span class="dv">6</span>) <span class="kw">id</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">--,lv.location_visit_id</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">--,lv.admission_datetime admit_dt_bed</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">--,lv.discharge_datetime disch_dt_bed</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.admission_datetime admit_dt_hosp</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.discharge_datetime disch_dt_hosp</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>,<span class="fu">ROUND</span>(<span class="fu">EXTRACT</span>(epoch <span class="kw">FROM</span> </span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    (hv.discharge_datetime <span class="op">-</span> (NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    ))<span class="op">/</span><span class="dv">3600</span>) hours_to_discharge</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.discharge_destination</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.patient_class</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">--,lo.location_string</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>,dept.name department</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- include age rounded to 5</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>, <span class="fu">ROUND</span>(DATE_PART(<span class="st">'year'</span>,AGE(cd.date_of_birth ))<span class="op">/</span><span class="dv">5</span>) <span class="op">*</span> <span class="dv">5</span> AGE</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- add last heart rate</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>,hr.value_as_real pulse</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">--,hr.observation_datetime</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> star.location_visit lv</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.location lo <span class="kw">ON</span> lv.location_id <span class="op">=</span> lo.location_id</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.department dept <span class="kw">ON</span> lo.department_id <span class="op">=</span> dept.department_id </span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.hospital_visit hv <span class="kw">ON</span> lv.hospital_visit_id <span class="op">=</span> hv.hospital_visit_id</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.core_demographic cd <span class="kw">ON</span> hv.mrn_id <span class="op">=</span> cd.mrn_id</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> (</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WITH</span> obs <span class="kw">AS</span> (</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>         vo.visit_observation_id</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>        ,vo.hospital_visit_id</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>        ,vo.observation_datetime</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        ,vo.value_as_real</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>        ,ot.name</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> star.visit_observation vo</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>        <span class="kw">LEFT</span> <span class="kw">JOIN</span> star.visit_observation_type ot <span class="kw">ON</span> vo.visit_observation_type_id <span class="op">=</span> ot.visit_observation_type_id</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> </span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>        ot.id_in_application <span class="op">=</span> <span class="st">'8'</span> <span class="co">-- heart rate</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        vo.observation_datetime <span class="op">&lt;</span> NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        vo.observation_datetime <span class="op">&gt;</span> NOW() <span class="op">-</span> <span class="st">'360 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    obs_tail <span class="kw">AS</span> (</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> </span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>         obs.<span class="op">*</span></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>        ,<span class="fu">row_number</span>() <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">BY</span> obs.hospital_visit_id <span class="kw">ORDER</span> <span class="kw">BY</span> obs.observation_datetime <span class="kw">DESC</span>) obs_tail</span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> obs</span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> </span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>     visit_observation_id</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    ,hospital_visit_id</span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    ,observation_datetime</span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    ,value_as_real</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>    ,NAME</span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> obs_tail </span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> obs_tail <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>) hr <span class="co">-- heart rate</span></span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> lv.hospital_visit_id <span class="op">=</span> hr.hospital_visit_id</span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> </span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>dept.name <span class="kw">IN</span> (</span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="st">'UCH T03 INTENSIVE CARE'</span></span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH SDEC'</span></span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T01 ACUTE MEDICAL'</span></span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T01 ENHANCED CARE'</span></span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 HEAD (T06H)'</span></span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 CENTRAL (T06C)'</span></span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 SOUTH PACU'</span></span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 GYNAE (T06G)'</span></span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 NORTH (T07N)'</span></span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 CV SURGE'</span></span>
-<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 SOUTH'</span></span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 SOUTH (T07S)'</span></span>
-<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 HDRU'</span></span>
-<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T08 NORTH (T08N)'</span></span>
-<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T08 SOUTH (T08S)'</span></span>
-<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T08S ARCU'</span></span>
-<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T09 SOUTH (T09S)'</span></span>
-<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T09 NORTH (T09N)'</span></span>
-<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T09 CENTRAL (T09C)'</span></span>
-<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T10 SOUTH (T10S)'</span></span>
-<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T10 NORTH (T10N)'</span></span>
-<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T10 MED (T10M)'</span></span>
-<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 SOUTH (T11S)'</span></span>
-<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 NORTH (T11N)'</span></span>
-<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 EAST (T11E)'</span></span>
-<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 NORTH (T11NO)'</span></span>
-<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T12 SOUTH (T12S)'</span></span>
-<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T12 NORTH (T12N)'</span></span>
-<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T13 SOUTH (T13S)'</span></span>
-<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T13 NORTH ONCOLOGY'</span></span>
-<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T13 NORTH (T13N)'</span></span>
-<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 NORTH TRAUMA'</span></span>
-<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 NORTH (T14N)'</span></span>
-<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 SOUTH ASU'</span></span>
-<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 SOUTH (T14S)'</span></span>
-<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 SOUTH DECANT'</span></span>
-<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 SOUTH (T15S)'</span></span>
-<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 NORTH (T15N)'</span></span>
-<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 NORTH DECANT'</span></span>
-<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T16 NORTH (T16N)'</span></span>
-<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T16 SOUTH (T16S)'</span></span>
-<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T16 SOUTH WINTER'</span></span>
-<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span></span>
-<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>lv.admission_datetime <span class="op">&lt;</span> NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
-<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span></span>
-<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>    (lv.discharge_datetime <span class="op">&gt;</span> NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
-<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>     <span class="kw">OR</span></span>
-<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>      (lv.discharge_datetime <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">AND</span> hv.discharge_datetime <span class="kw">IS</span> <span class="kw">NULL</span>)</span>
-<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> </span>
-<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>lo.location_string <span class="kw">NOT</span> <span class="kw">LIKE</span> <span class="st">'%WAIT%'</span></span>
-<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> </span>
-<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>lo.location_string <span class="kw">NOT</span> <span class="kw">LIKE</span> <span class="st">'%null%'</span></span>
-<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T22:59:59.151184Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T22:59:59.149989Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T22:59:59.157929Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T22:59:59.156758Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T22:59:59.151146Z&quot;}" data-tags="[]" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> Path(<span class="st">'utils/queries/discharges_dummy.sql'</span>).read_text()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># this handles escaping etc (e.g. % should be %%)</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> sa.text(q)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">left</span>(md5(lv.hospital_visit_id:<span class="ch">:TEXT</span>), <span class="dv">6</span>) <span class="kw">id</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">--,lv.location_visit_id</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">--,lv.admission_datetime admit_dt_bed</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">--,lv.discharge_datetime disch_dt_bed</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.admission_datetime admit_dt_hosp</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.discharge_datetime disch_dt_hosp</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>,<span class="fu">ROUND</span>(<span class="fu">EXTRACT</span>(epoch <span class="kw">FROM</span> </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    (hv.discharge_datetime <span class="op">-</span> (NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    ))<span class="op">/</span><span class="dv">3600</span>) hours_to_discharge</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.discharge_destination</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">--,hv.patient_class</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">--,lo.location_string</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>,dept.name department</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- include age rounded to 5</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>, <span class="fu">ROUND</span>(DATE_PART(<span class="st">'year'</span>,AGE(cd.date_of_birth ))<span class="op">/</span><span class="dv">5</span>) <span class="op">*</span> <span class="dv">5</span> AGE</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- add last heart rate</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>,hr.value_as_real pulse</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co">--,hr.observation_datetime</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> star.location_visit lv</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.location lo <span class="kw">ON</span> lv.location_id <span class="op">=</span> lo.location_id</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.department dept <span class="kw">ON</span> lo.department_id <span class="op">=</span> dept.department_id </span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.hospital_visit hv <span class="kw">ON</span> lv.hospital_visit_id <span class="op">=</span> hv.hospital_visit_id</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> star.core_demographic cd <span class="kw">ON</span> hv.mrn_id <span class="op">=</span> cd.mrn_id</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> (</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WITH</span> obs <span class="kw">AS</span> (</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>         vo.visit_observation_id</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        ,vo.hospital_visit_id</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>        ,vo.observation_datetime</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        ,vo.value_as_real</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        ,ot.name</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> star.visit_observation vo</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>        <span class="kw">LEFT</span> <span class="kw">JOIN</span> star.visit_observation_type ot <span class="kw">ON</span> vo.visit_observation_type_id <span class="op">=</span> ot.visit_observation_type_id</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> </span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>        ot.id_in_application <span class="op">=</span> <span class="st">'8'</span> <span class="co">-- heart rate</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>        vo.observation_datetime <span class="op">&lt;</span> NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>        <span class="kw">AND</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>        vo.observation_datetime <span class="op">&gt;</span> NOW() <span class="op">-</span> <span class="st">'360 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    obs_tail <span class="kw">AS</span> (</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> </span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>         obs.<span class="op">*</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>        ,<span class="fu">row_number</span>() <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">BY</span> obs.hospital_visit_id <span class="kw">ORDER</span> <span class="kw">BY</span> obs.observation_datetime <span class="kw">DESC</span>) obs_tail</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> obs</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> </span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>     visit_observation_id</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    ,hospital_visit_id</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    ,observation_datetime</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    ,value_as_real</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>    ,NAME</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> obs_tail </span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> obs_tail <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>) hr <span class="co">-- heart rate</span></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> lv.hospital_visit_id <span class="op">=</span> hr.hospital_visit_id</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> </span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>dept.name <span class="kw">IN</span> (</span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a><span class="st">'UCH T03 INTENSIVE CARE'</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH SDEC'</span></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T01 ACUTE MEDICAL'</span></span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T01 ENHANCED CARE'</span></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 HEAD (T06H)'</span></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 CENTRAL (T06C)'</span></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 SOUTH PACU'</span></span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T06 GYNAE (T06G)'</span></span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 NORTH (T07N)'</span></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 CV SURGE'</span></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 SOUTH'</span></span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 SOUTH (T07S)'</span></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T07 HDRU'</span></span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T08 NORTH (T08N)'</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T08 SOUTH (T08S)'</span></span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T08S ARCU'</span></span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T09 SOUTH (T09S)'</span></span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T09 NORTH (T09N)'</span></span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T09 CENTRAL (T09C)'</span></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T10 SOUTH (T10S)'</span></span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T10 NORTH (T10N)'</span></span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T10 MED (T10M)'</span></span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 SOUTH (T11S)'</span></span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 NORTH (T11N)'</span></span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 EAST (T11E)'</span></span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T11 NORTH (T11NO)'</span></span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T12 SOUTH (T12S)'</span></span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T12 NORTH (T12N)'</span></span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T13 SOUTH (T13S)'</span></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T13 NORTH ONCOLOGY'</span></span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T13 NORTH (T13N)'</span></span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 NORTH TRAUMA'</span></span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 NORTH (T14N)'</span></span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 SOUTH ASU'</span></span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T14 SOUTH (T14S)'</span></span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 SOUTH DECANT'</span></span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 SOUTH (T15S)'</span></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 NORTH (T15N)'</span></span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T15 NORTH DECANT'</span></span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T16 NORTH (T16N)'</span></span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T16 SOUTH (T16S)'</span></span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>,<span class="st">'UCH T16 SOUTH WINTER'</span></span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span></span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a>lv.admission_datetime <span class="op">&lt;</span> NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span></span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>    (lv.discharge_datetime <span class="op">&gt;</span> NOW() <span class="op">-</span> <span class="st">'336 HOURS'</span>:<span class="ch">:INTERVAL</span> </span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>     <span class="kw">OR</span></span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>      (lv.discharge_datetime <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">AND</span> hv.discharge_datetime <span class="kw">IS</span> <span class="kw">NULL</span>)</span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> </span>
+<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a>lo.location_string <span class="kw">NOT</span> <span class="kw">LIKE</span> <span class="st">'%WAIT%'</span></span>
+<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> </span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>lo.location_string <span class="kw">NOT</span> <span class="kw">LIKE</span> <span class="st">'%null%'</span></span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To benefit from syntax highlighting, proper version control and other goodness then we’ll actually load the query from its own file. The list above is there just to improve the flow and readability of this notebook.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:01.298191Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:01.297825Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:01.304687Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:01.302464Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:01.298161Z&quot;}" data-tags="[]" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> Path(<span class="st">'utils/queries/discharges_dummy.sql'</span>).read_text()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># this handles escaping etc (e.g. % in the LIKE clause becomes %%)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> sa.text(q)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T22:59:59.674971Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T22:59:59.674420Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T23:00:01.061387Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T23:00:01.060274Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T22:59:59.674938Z&quot;}" data-tags="[]" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_sql_query(q, emapdb_engine)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:01.306344Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:01.306042Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.104060Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.103011Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:01.306315Z&quot;}" data-tags="[]" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_sql_query(q, emapdb_engine)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-tags="[]">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now inspect the fields</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.105967Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.105623Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.123753Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.122731Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.105933Z&quot;}" data-tags="[]" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 444 entries, 0 to 443
+Data columns (total 5 columns):
+ #   Column              Non-Null Count  Dtype  
+---  ------              --------------  -----  
+ 0   id                  444 non-null    object 
+ 1   hours_to_discharge  263 non-null    float64
+ 2   department          444 non-null    object 
+ 3   age                 444 non-null    float64
+ 4   pulse               381 non-null    float64
+dtypes: float64(3), object(2)
+memory usage: 17.5+ KB</code></pre>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T23:00:04.815701Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T23:00:04.815171Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T23:00:04.824238Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T23:00:04.823254Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T23:00:04.815668Z&quot;}" data-tags="[]" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df.department.value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
-<pre><code>UCH T10 SOUTH (T10S)      34
-UCH T01 ACUTE MEDICAL     33
-UCH SDEC                  30
-UCH T09 NORTH (T09N)      26
-UCH T03 INTENSIVE CARE    25
-UCH T10 NORTH (T10N)      23
+</div>
+</section>
+<section id="simulatefake-each-field" class="level2">
+<h2 class="anchored" data-anchor-id="simulatefake-each-field">Simulate/fake each field</h2>
+<section id="hours-to-discharge" class="level3">
+<h3 class="anchored" data-anchor-id="hours-to-discharge">Hours to discharge</h3>
+<p>Plot the distribution, then pick a distribution and create a simple sample</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.125737Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.125167Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.146807Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.145823Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.125608Z&quot;}" data-tags="[]" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>LoS <span class="op">=</span> df[<span class="st">'hours_to_discharge'</span>]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>LoS.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>count    263.000000
+mean     108.049430
+std       82.814341
+min        1.000000
+25%       43.000000
+50%       86.000000
+75%      157.500000
+max      332.000000
+Name: hours_to_discharge, dtype: float64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.148498Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.148017Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.367250Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.366219Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.148468Z&quot;}" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>n, bins, patches <span class="op">=</span> plt.hist(LoS, bins<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="prepare-synthetic-data_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Now generate an empirical distribution that roughly matches as above by sampling with replacement</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.368981Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.368645Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.380851Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.379743Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.368949Z&quot;}" data-tags="[]" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>LoS_sample <span class="op">=</span> LoS.sample(frac<span class="op">=</span><span class="dv">1</span>, replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>LoS_sample.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>count    263.000000
+mean      96.634981
+std       80.698500
+min        1.000000
+25%       40.000000
+50%       68.000000
+75%      138.500000
+max      305.000000
+Name: hours_to_discharge, dtype: float64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.382588Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.381769Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.586995Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.586052Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.382555Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>n, bins, patches <span class="op">=</span> plt.hist(LoS_sample, bins<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="prepare-synthetic-data_files/figure-html/cell-13-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="department" class="level3">
+<h3 class="anchored" data-anchor-id="department">Department</h3>
+<p>Plot the distribution, then pick a distribution and create a simple sample</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.588259Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.587948Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.598017Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.596673Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.588229Z&quot;}" data-tags="[]" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>department <span class="op">=</span> df[<span class="st">'department'</span>]</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>department.value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>UCH T01 ACUTE MEDICAL     36
+UCH T10 SOUTH (T10S)      35
+UCH T10 NORTH (T10N)      24
+UCH T09 NORTH (T09N)      24
+UCH T13 NORTH ONCOLOGY    24
+UCH SDEC                  23
 UCH T13 SOUTH (T13S)      22
-UCH T13 NORTH ONCOLOGY    22
-UCH T07 NORTH (T07N)      19
+UCH T08 SOUTH (T08S)      21
+UCH T08 NORTH (T08N)      20
 UCH T09 CENTRAL (T09C)    19
-UCH T08 SOUTH (T08S)      19
-UCH T08 NORTH (T08N)      18
-UCH T16 NORTH (T16N)      16
-UCH T14 NORTH TRAUMA      15
-UCH T12 NORTH (T12N)      15
-UCH T14 SOUTH ASU         14
+UCH T03 INTENSIVE CARE    19
+UCH T12 NORTH (T12N)      18
+UCH T14 NORTH TRAUMA      17
+UCH T16 NORTH (T16N)      15
+UCH T07 NORTH (T07N)      15
 UCH T16 SOUTH WINTER      14
-UCH T06 HEAD (T06H)       14
-UCH T01 ENHANCED CARE     14
-UCH T12 SOUTH (T12S)      11
-UCH T11 NORTH (T11N)      10
-UCH T07 SOUTH             10
-UCH T06 SOUTH PACU         9
-UCH T06 CENTRAL (T06C)     9
+UCH T14 SOUTH ASU         13
+UCH T06 HEAD (T06H)       12
+UCH T12 SOUTH (T12S)      10
+UCH T11 NORTH (T11N)       9
+UCH T01 ENHANCED CARE      9
 UCH T11 SOUTH (T11S)       9
+UCH T07 SOUTH              7
+UCH T06 CENTRAL (T06C)     6
 UCH T14 NORTH (T14N)       4
-UCH T06 GYNAE (T06G)       3
+UCH T06 SOUTH PACU         4
 UCH T09 SOUTH (T09S)       3
-UCH T07 SOUTH (T07S)       2
+UCH T06 GYNAE (T06G)       3
 UCH T15 SOUTH (T15S)       2
+UCH T07 SOUTH (T07S)       2
 UCH T10 MED (T10M)         1
 UCH T08S ARCU              1
 UCH T15 NORTH (T15N)       1
+UCH T11 EAST (T11E)        1
 UCH T16 SOUTH (T16S)       1
 Name: department, dtype: int64</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T23:00:10.937747Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T23:00:10.937199Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T23:00:11.008443Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T23:00:11.007521Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T23:00:10.937702Z&quot;}" data-tags="[]" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>px.histogram(df.age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.600030Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.599325Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:03.606337Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:03.605183Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.599998Z&quot;}" data-tags="[]" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df.groupby(<span class="st">'department'</span>)[<span class="st">'department'</span>].count()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:03.608642Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:03.607670Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.028092Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.027086Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:03.608611Z&quot;}" data-tags="[]" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(dpi<span class="op">=</span><span class="fl">1.5</span><span class="op">*</span><span class="dv">72</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>ax.bar(X.index, X.values)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">90</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<div>                            <div id="d5871055-6a5e-4fa5-9ad5-b758382caad2" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("d5871055-6a5e-4fa5-9ad5-b758382caad2")) {                    Plotly.newPlot(                        "d5871055-6a5e-4fa5-9ad5-b758382caad2",                        [{"alignmentgroup":"True","bingroup":"x","hovertemplate":"variable=age<br>value=%{x}<br>count=%{y}<extra></extra>","legendgroup":"age","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"age","offsetgroup":"age","orientation":"v","showlegend":true,"x":[65.0,85.0,90.0,80.0,100.0,35.0,0.0,65.0,15.0,65.0,20.0,60.0,15.0,95.0,80.0,70.0,75.0,45.0,60.0,60.0,65.0,65.0,55.0,30.0,75.0,65.0,55.0,30.0,65.0,35.0,55.0,120.0,75.0,60.0,95.0,80.0,75.0,45.0,50.0,55.0,50.0,70.0,55.0,55.0,55.0,95.0,65.0,75.0,40.0,95.0,30.0,35.0,55.0,85.0,90.0,60.0,75.0,70.0,80.0,75.0,55.0,65.0,50.0,30.0,10.0,80.0,70.0,60.0,80.0,55.0,15.0,65.0,85.0,30.0,30.0,55.0,65.0,90.0,35.0,75.0,60.0,95.0,65.0,65.0,60.0,15.0,100.0,90.0,15.0,30.0,65.0,50.0,35.0,85.0,25.0,55.0,15.0,10.0,15.0,70.0,85.0,90.0,85.0,50.0,40.0,65.0,75.0,55.0,75.0,90.0,40.0,30.0,70.0,75.0,85.0,35.0,25.0,80.0,90.0,80.0,75.0,95.0,80.0,75.0,85.0,85.0,80.0,40.0,85.0,90.0,90.0,60.0,50.0,75.0,90.0,65.0,45.0,75.0,70.0,65.0,40.0,20.0,75.0,60.0,80.0,75.0,75.0,60.0,80.0,65.0,70.0,65.0,70.0,50.0,70.0,85.0,35.0,75.0,55.0,55.0,75.0,60.0,80.0,75.0,50.0,85.0,70.0,25.0,60.0,20.0,70.0,45.0,35.0,75.0,65.0,85.0,65.0,30.0,70.0,65.0,25.0,85.0,80.0,60.0,80.0,85.0,55.0,20.0,65.0,75.0,45.0,80.0,60.0,70.0,55.0,20.0,25.0,75.0,25.0,45.0,65.0,45.0,60.0,75.0,45.0,50.0,80.0,80.0,35.0,55.0,25.0,70.0,70.0,50.0,65.0,60.0,60.0,60.0,60.0,65.0,75.0,40.0,90.0,75.0,20.0,85.0,65.0,80.0,70.0,75.0,80.0,65.0,45.0,70.0,30.0,60.0,75.0,45.0,60.0,75.0,40.0,55.0,40.0,60.0,65.0,70.0,60.0,70.0,90.0,65.0,85.0,65.0,70.0,45.0,90.0,30.0,65.0,75.0,60.0,50.0,80.0,70.0,65.0,85.0,85.0,55.0,10.0,70.0,5.0,80.0,60.0,90.0,75.0,45.0,15.0,85.0,15.0,15.0,85.0,15.0,90.0,20.0,85.0,70.0,20.0,15.0,95.0,20.0,80.0,85.0,90.0,75.0,75.0,15.0,55.0,10.0,50.0,80.0,90.0,70.0,65.0,35.0,80.0,85.0,55.0,70.0,85.0,75.0,85.0,50.0,90.0,50.0,80.0,85.0,15.0,85.0,5.0,75.0,15.0,85.0,75.0,15.0,10.0,5.0,80.0,15.0,80.0,15.0,70.0,60.0,5.0,15.0,15.0,15.0,85.0,75.0,45.0,10.0,10.0,15.0,15.0,15.0,65.0,55.0,0.0,45.0,20.0,70.0,35.0,35.0,20.0,55.0,90.0,40.0,55.0,35.0,50.0,60.0,10.0,60.0,75.0,75.0,65.0,80.0,55.0,30.0,65.0,40.0,65.0,70.0,70.0,60.0,45.0,55.0,45.0,40.0,55.0,55.0,55.0,45.0,55.0,65.0,85.0,75.0,5.0,55.0,55.0,80.0,20.0,50.0,30.0,80.0,65.0,30.0,80.0,25.0,65.0,60.0,45.0,75.0,65.0,65.0,80.0,45.0,50.0,60.0,60.0,30.0,75.0,75.0,60.0,65.0,55.0,70.0,30.0,65.0,65.0,75.0,75.0,50.0,70.0,50.0,35.0,60.0,35.0,60.0,65.0,70.0,30.0,70.0,60.0,85.0,30.0,20.0,65.0,40.0,45.0,60.0,45.0,65.0,85.0,25.0,30.0,70.0,65.0,25.0,20.0,25.0,60.0,30.0,70.0,40.0,65.0,30.0,90.0,65.0,20.0,60.0,55.0,80.0,70.0,85.0,50.0,55.0,65.0,70.0,75.0,75.0],"xaxis":"x","yaxis":"y","type":"histogram"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"value"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"count"}},"legend":{"title":{"text":"variable"},"tracegroupgap":0},"margin":{"t":60},"barmode":"relative"},                        {"responsive": true}                    ).then(function(){
-                            
-var gd = document.getElementById('d5871055-6a5e-4fa5-9ad5-b758382caad2');
-var x = new MutationObserver(function (mutations, observer) {{
-        var display = window.getComputedStyle(gd).display;
-        if (!display || display === 'none') {{
-            console.log([gd, 'removed!']);
-            Plotly.purge(gd);
-            observer.disconnect();
-        }}
-}});
-
-// Listen for the removal of the full notebook cells
-var notebookContainer = gd.closest('#notebook-container');
-if (notebookContainer) {{
-    x.observe(notebookContainer, {childList: true});
-}}
-
-// Listen for the clearing of the current output cell
-var outputEl = gd.closest('.output');
-if (outputEl) {{
-    x.observe(outputEl, {childList: true});
-}}
-
-                        })                };                });            </script>        </div>
+<p><img src="prepare-synthetic-data_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T23:00:13.395993Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T23:00:13.395036Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T23:00:13.459603Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T23:00:13.458733Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T23:00:13.395954Z&quot;}" data-tags="[]" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>px.histogram(df.pulse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now generate an empirical distribution that roughly matches as above by sampling with replacement</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.029333Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.029027Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.038957Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.038082Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.029303Z&quot;}" data-tags="[]" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>department_sample <span class="op">=</span>department.sample(frac<span class="op">=</span><span class="dv">1</span>, replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>department_sample.value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>UCH T01 ACUTE MEDICAL     45
+UCH T10 SOUTH (T10S)      37
+UCH T09 CENTRAL (T09C)    30
+UCH T13 NORTH ONCOLOGY    26
+UCH T10 NORTH (T10N)      26
+UCH T09 NORTH (T09N)      25
+UCH T13 SOUTH (T13S)      23
+UCH T03 INTENSIVE CARE    22
+UCH SDEC                  22
+UCH T07 NORTH (T07N)      21
+UCH T06 HEAD (T06H)       16
+UCH T12 NORTH (T12N)      16
+UCH T16 NORTH (T16N)      16
+UCH T14 SOUTH ASU         14
+UCH T08 SOUTH (T08S)      14
+UCH T14 NORTH TRAUMA      12
+UCH T16 SOUTH WINTER      12
+UCH T08 NORTH (T08N)      11
+UCH T11 NORTH (T11N)      10
+UCH T11 SOUTH (T11S)       7
+UCH T01 ENHANCED CARE      6
+UCH T07 SOUTH              6
+UCH T12 SOUTH (T12S)       5
+UCH T06 SOUTH PACU         5
+UCH T14 NORTH (T14N)       3
+UCH T06 CENTRAL (T06C)     3
+UCH T06 GYNAE (T06G)       3
+UCH T15 SOUTH (T15S)       3
+UCH T07 SOUTH (T07S)       1
+UCH T15 NORTH (T15N)       1
+UCH T16 SOUTH (T16S)       1
+UCH T10 MED (T10M)         1
+UCH T09 SOUTH (T09S)       1
+Name: department, dtype: int64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.040854Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.040339Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.431584Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.430573Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.040822Z&quot;}" data-tags="[]" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>X_s <span class="op">=</span> department_sample.value_counts()</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>X_s <span class="op">=</span> X_s.reindex(X.index)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(dpi<span class="op">=</span><span class="fl">1.5</span><span class="op">*</span><span class="dv">72</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ax.bar(X_s.index, X_s.values)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">90</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<div>                            <div id="158b3aa7-6c4e-4c46-b010-1ce05cec2c26" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("158b3aa7-6c4e-4c46-b010-1ce05cec2c26")) {                    Plotly.newPlot(                        "158b3aa7-6c4e-4c46-b010-1ce05cec2c26",                        [{"alignmentgroup":"True","bingroup":"x","hovertemplate":"variable=pulse<br>value=%{x}<br>count=%{y}<extra></extra>","legendgroup":"pulse","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"pulse","offsetgroup":"pulse","orientation":"v","showlegend":true,"x":[86.0,54.0,72.0,81.0,null,68.0,149.0,88.0,66.0,72.0,null,55.0,104.0,101.0,76.0,null,null,85.0,null,66.0,null,72.0,52.0,103.0,55.0,69.0,58.0,99.0,98.0,54.0,90.0,61.0,69.0,115.0,null,73.0,79.0,72.0,123.0,77.0,87.0,null,103.0,115.0,70.0,79.0,74.0,79.0,90.0,65.0,62.0,89.0,80.0,73.0,78.0,80.0,64.0,67.0,91.0,null,80.0,null,89.0,64.0,78.0,null,77.0,86.0,78.0,102.0,109.0,84.0,65.0,124.0,null,58.0,81.0,59.0,100.0,77.0,58.0,57.0,59.0,73.0,null,72.0,67.0,76.0,107.0,86.0,79.0,88.0,86.0,68.0,79.0,null,110.0,null,83.0,87.0,null,null,73.0,117.0,121.0,null,91.0,70.0,63.0,75.0,98.0,108.0,null,86.0,82.0,81.0,88.0,69.0,100.0,78.0,65.0,88.0,63.0,78.0,69.0,74.0,58.0,94.0,94.0,98.0,78.0,67.0,82.0,85.0,65.0,63.0,87.0,81.0,80.0,92.0,null,null,80.0,54.0,88.0,86.0,73.0,84.0,86.0,75.0,82.0,44.0,76.0,57.0,57.0,72.0,61.0,65.0,64.0,68.0,73.0,75.0,89.0,96.0,98.0,72.0,83.0,null,89.0,111.0,88.0,null,109.0,68.0,79.0,80.0,68.0,65.0,82.0,106.0,137.0,81.0,89.0,91.0,69.0,100.0,68.0,65.0,83.0,null,70.0,73.0,83.0,68.0,102.0,65.0,80.0,66.0,105.0,77.0,null,92.0,78.0,88.0,68.0,77.0,null,null,null,92.0,71.0,73.0,88.0,96.0,94.0,83.0,67.0,78.0,73.0,98.0,78.0,104.0,97.0,91.0,93.0,86.0,null,45.0,108.0,66.0,81.0,79.0,84.0,null,81.0,82.0,76.0,61.0,79.0,100.0,105.0,67.0,102.0,71.0,null,null,75.0,76.0,55.0,70.0,75.0,null,64.0,60.0,76.0,99.0,79.0,71.0,90.0,86.0,86.0,72.0,null,79.0,60.0,69.0,95.0,59.0,123.0,67.0,62.0,null,97.0,null,77.0,84.0,66.0,98.0,77.0,89.0,97.0,null,79.0,91.0,null,78.0,61.0,62.0,77.0,65.0,92.0,75.0,65.0,141.0,101.0,100.0,null,86.0,71.0,78.0,83.0,119.0,96.0,92.0,99.0,90.0,88.0,null,50.0,null,109.0,99.0,64.0,56.0,106.0,82.0,null,84.0,88.0,72.0,70.0,107.0,85.0,null,73.0,100.0,71.0,97.0,87.0,105.0,null,86.0,null,103.0,68.0,79.0,69.0,100.0,null,108.0,128.0,89.0,null,58.0,127.0,96.0,133.0,83.0,70.0,70.0,83.0,119.0,null,64.0,85.0,62.0,96.0,85.0,112.0,75.0,null,null,77.0,71.0,80.0,114.0,76.0,80.0,82.0,77.0,101.0,86.0,108.0,132.0,63.0,63.0,69.0,null,89.0,84.0,91.0,79.0,77.0,72.0,null,88.0,87.0,96.0,83.0,75.0,80.0,81.0,82.0,75.0,67.0,106.0,59.0,87.0,76.0,84.0,80.0,49.0,59.0,null,57.0,101.0,69.0,62.0,null,66.0,91.0,91.0,98.0,78.0,80.0,87.0,60.0,75.0,70.0,60.0,55.0,67.0,110.0,116.0,94.0,90.0,74.0,83.0,89.0,74.0,62.0,null,94.0,96.0,96.0,88.0,null,76.0,null,58.0,null,55.0,96.0,115.0,68.0,null,null,null,73.0,80.0,116.0,86.0,52.0,null,62.0,86.0,94.0,null,63.0,76.0,88.0,null,85.0,79.0,88.0,85.0,57.0,100.0],"xaxis":"x","yaxis":"y","type":"histogram"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"value"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"count"}},"legend":{"title":{"text":"variable"},"tracegroupgap":0},"margin":{"t":60},"barmode":"relative"},                        {"responsive": true}                    ).then(function(){
-                            
-var gd = document.getElementById('158b3aa7-6c4e-4c46-b010-1ce05cec2c26');
-var x = new MutationObserver(function (mutations, observer) {{
-        var display = window.getComputedStyle(gd).display;
-        if (!display || display === 'none') {{
-            console.log([gd, 'removed!']);
-            Plotly.purge(gd);
-            observer.disconnect();
-        }}
-}});
-
-// Listen for the removal of the full notebook cells
-var notebookContainer = gd.closest('#notebook-container');
-if (notebookContainer) {{
-    x.observe(notebookContainer, {childList: true});
-}}
-
-// Listen for the clearing of the current output cell
-var outputEl = gd.closest('.output');
-if (outputEl) {{
-    x.observe(outputEl, {childList: true});
-}}
-
-                        })                };                });            </script>        </div>
+<p><img src="prepare-synthetic-data_files/figure-html/cell-18-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T23:00:15.586907Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T23:00:15.586365Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T23:00:15.596975Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T23:00:15.596153Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T23:00:15.586874Z&quot;}" data-tags="[]" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df.hours_to_discharge</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="age" class="level3">
+<h3 class="anchored" data-anchor-id="age">Age</h3>
+<p>Plot the distribution, then pick a distribution and create a simple sample</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.433229Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.432925Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.443985Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.442851Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.433199Z&quot;}" data-tags="[]" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>age <span class="op">=</span> df[<span class="st">'age'</span>]</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>age.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>count    444.000000
+mean      57.927928
+std       23.748289
+min        0.000000
+25%       40.000000
+50%       65.000000
+75%       75.000000
+max      100.000000
+Name: age, dtype: float64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.445803Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.444840Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.627006Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.625983Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.445773Z&quot;}" data-tags="[]" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>n, bins, patches <span class="op">=</span> plt.hist(age, bins<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="prepare-synthetic-data_files/figure-html/cell-20-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Now generate an empirical distribution that roughly matches as above by sampling with replacement</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.629369Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.628516Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.639886Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.638951Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.629333Z&quot;}" data-tags="[]" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>age_sample <span class="op">=</span> age.sample(frac<span class="op">=</span><span class="dv">1</span>, replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>age_sample.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>count    444.000000
+mean      58.355856
+std       22.933793
+min        5.000000
+25%       43.750000
+50%       65.000000
+75%       75.000000
+max      100.000000
+Name: age, dtype: float64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.644501Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.644187Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.843016Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.841950Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.644472Z&quot;}" data-tags="[]" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>n, bins, patches <span class="op">=</span> plt.hist(age_sample, bins<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="prepare-synthetic-data_files/figure-html/cell-22-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="pulse" class="level3">
+<h3 class="anchored" data-anchor-id="pulse">Pulse</h3>
+<p>Plot the distribution, then pick a distribution and create a simple sample</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.844821Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.844348Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:04.855868Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:04.854929Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.844788Z&quot;}" data-tags="[]" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pulse <span class="op">=</span> df[<span class="st">'pulse'</span>]</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>pulse.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
-<pre><code>0       16.0
-1      324.0
-2        NaN
-3       17.0
-4        NaN
-       ...  
-463     17.0
-464     17.0
-465      NaN
-466     17.0
-467    284.0
-Name: hours_to_discharge, Length: 468, dtype: float64</code></pre>
+<pre><code>count    381.000000
+mean      81.391076
+std       17.147712
+min       42.000000
+25%       70.000000
+50%       80.000000
+75%       90.000000
+max      187.000000
+Name: pulse, dtype: float64</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-08T23:00:18.680432Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-08T23:00:18.679871Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-08T23:00:18.777657Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-08T23:00:18.776811Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-08T23:00:18.680399Z&quot;}" data-tags="[]" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>px.histogram(df.hours_to_discharge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:04.857712Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:04.857076Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:05.073867Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:05.072931Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:04.857681Z&quot;}" data-tags="[]" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>n, bins, patches <span class="op">=</span> plt.hist(pulse, bins<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-
-<div>                            <div id="624d0aa1-af54-4964-8174-f82e75216265" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("624d0aa1-af54-4964-8174-f82e75216265")) {                    Plotly.newPlot(                        "624d0aa1-af54-4964-8174-f82e75216265",                        [{"alignmentgroup":"True","bingroup":"x","hovertemplate":"variable=hours_to_discharge<br>value=%{x}<br>count=%{y}<extra></extra>","legendgroup":"hours_to_discharge","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"hours_to_discharge","offsetgroup":"hours_to_discharge","orientation":"v","showlegend":true,"x":[16.0,324.0,null,17.0,null,40.0,17.0,15.0,81.0,14.0,null,112.0,null,322.0,null,null,null,91.0,null,62.0,null,16.0,13.0,18.0,156.0,113.0,16.0,328.0,null,null,null,42.0,204.0,115.0,null,null,64.0,null,null,11.0,18.0,null,189.0,157.0,281.0,293.0,65.0,155.0,17.0,112.0,15.0,null,138.0,137.0,20.0,187.0,138.0,136.0,44.0,null,137.0,null,null,285.0,12.0,null,136.0,163.0,137.0,255.0,170.0,157.0,null,43.0,null,186.0,113.0,301.0,187.0,181.0,20.0,112.0,184.0,null,null,118.0,4.0,null,null,62.0,null,113.0,null,136.0,18.0,null,68.0,null,null,133.0,null,null,null,19.0,null,null,279.0,20.0,211.0,84.0,null,328.0,null,39.0,145.0,14.0,null,256.0,null,null,null,null,60.0,44.0,182.0,18.0,18.0,284.0,168.0,135.0,21.0,83.0,91.0,136.0,14.0,16.0,187.0,19.0,21.0,181.0,null,null,163.0,63.0,210.0,null,15.0,185.0,229.0,null,37.0,186.0,116.0,39.0,161.0,113.0,null,185.0,43.0,157.0,null,19.0,161.0,null,null,65.0,140.0,null,305.0,20.0,21.0,null,null,203.0,284.0,225.0,17.0,23.0,73.0,24.0,null,37.0,206.0,114.0,38.0,159.0,null,null,null,93.0,43.0,null,202.0,111.0,176.0,null,20.0,14.0,116.0,null,null,176.0,null,null,160.0,20.0,null,null,null,137.0,43.0,null,null,85.0,324.0,112.0,null,17.0,66.0,null,40.0,null,65.0,136.0,87.0,null,null,308.0,null,328.0,67.0,null,88.0,null,205.0,259.0,35.0,329.0,276.0,187.0,113.0,null,44.0,186.0,null,null,null,null,306.0,16.0,null,null,184.0,142.0,181.0,304.0,null,170.0,null,null,null,19.0,null,17.0,274.0,39.0,59.0,null,90.0,160.0,null,null,null,null,40.0,null,15.0,21.0,277.0,16.0,null,null,null,null,null,17.0,183.0,17.0,null,null,null,null,230.0,null,null,89.0,null,null,null,259.0,160.0,null,42.0,156.0,null,null,null,null,88.0,null,null,114.0,null,44.0,213.0,307.0,null,144.0,null,211.0,331.0,161.0,114.0,null,6.0,20.0,162.0,307.0,null,258.0,null,20.0,null,20.0,39.0,159.0,159.0,110.0,null,164.0,null,208.0,null,114.0,15.0,115.0,null,null,22.0,68.0,null,248.0,null,13.0,139.0,187.0,181.0,null,null,39.0,null,null,null,null,null,68.0,null,null,20.0,null,null,20.0,null,25.0,107.0,null,38.0,null,null,40.0,19.0,16.0,null,20.0,null,20.0,17.0,18.0,17.0,23.0,36.0,303.0,300.0,null,134.0,null,67.0,133.0,20.0,null,43.0,64.0,86.0,null,19.0,135.0,null,19.0,292.0,null,118.0,null,140.0,13.0,116.0,40.0,18.0,null,19.0,14.0,null,null,114.0,null,138.0,34.0,88.0,null,22.0,138.0,16.0,null,161.0,135.0,38.0,12.0,null,11.0,null,43.0,null,87.0,1.0,64.0,43.0,null,null,null,253.0,1.0,213.0,13.0,186.0,null,21.0,233.0,68.0,null,17.0,null,162.0,null,15.0,17.0,17.0,null,17.0,284.0],"xaxis":"x","yaxis":"y","type":"histogram"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"value"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"count"}},"legend":{"title":{"text":"variable"},"tracegroupgap":0},"margin":{"t":60},"barmode":"relative"},                        {"responsive": true}                    ).then(function(){
-                            
-var gd = document.getElementById('624d0aa1-af54-4964-8174-f82e75216265');
-var x = new MutationObserver(function (mutations, observer) {{
-        var display = window.getComputedStyle(gd).display;
-        if (!display || display === 'none') {{
-            console.log([gd, 'removed!']);
-            Plotly.purge(gd);
-            observer.disconnect();
-        }}
-}});
-
-// Listen for the removal of the full notebook cells
-var notebookContainer = gd.closest('#notebook-container');
-if (notebookContainer) {{
-    x.observe(notebookContainer, {childList: true});
-}}
-
-// Listen for the clearing of the current output cell
-var outputEl = gd.closest('.output');
-if (outputEl) {{
-    x.observe(outputEl, {childList: true});
-}}
-
-                        })                };                });            </script>        </div>
+<p><img src="prepare-synthetic-data_files/figure-html/cell-24-output-1.png" class="img-fluid"></p>
 </div>
+</div>
+<p>Now generate an empirical distribution that roughly matches as above by sampling with replacement</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:05.075647Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:05.075219Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:05.087954Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:05.086696Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:05.075606Z&quot;}" data-tags="[]" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>pulse_sample <span class="op">=</span> pulse.sample(frac<span class="op">=</span><span class="dv">1</span>, replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>pulse_sample.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<pre><code>count    375.000000
+mean      79.696000
+std       15.435336
+min       46.000000
+25%       68.500000
+50%       78.000000
+75%       89.000000
+max      133.000000
+Name: pulse, dtype: float64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:37:05.090032Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:37:05.089139Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:37:05.274742Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:37:05.273497Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:37:05.089998Z&quot;}" data-tags="[]" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>n, bins, patches <span class="op">=</span> plt.hist(pulse_sample, bins<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="prepare-synthetic-data_files/figure-html/cell-26-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:38:08.972222Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:38:08.971696Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:38:08.980757Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:38:08.979618Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:38:08.972190Z&quot;}" data-tags="[]" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>pulse_sample</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>115     59.0
+363    102.0
+317     72.0
+257     60.0
+265      NaN
+       ...  
+237      NaN
+118     87.0
+47      78.0
+253     63.0
+394     77.0
+Name: pulse, Length: 444, dtype: float64</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="prepare-dummy-data-frame" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-dummy-data-frame">Prepare dummy data frame</h2>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:44:25.174714Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:44:25.174029Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:44:25.179846Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:44:25.179151Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:44:25.174681Z&quot;}" data-tags="[]" data-execution_count="44">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>LoS_sample.reset_index(inplace<span class="op">=</span><span class="va">True</span>, drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>department_sample.reset_index(inplace<span class="op">=</span><span class="va">True</span>, drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>age_sample.reset_index(inplace<span class="op">=</span><span class="va">True</span>, drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>pulse_sample.reset_index(inplace<span class="op">=</span><span class="va">True</span>, drop<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:44:25.742662Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:44:25.742148Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:44:25.750197Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:44:25.749206Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:44:25.742629Z&quot;}" data-tags="[]" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>df_dummy <span class="op">=</span> pd.concat([LoS_sample, department_sample, age_sample, pulse_sample], axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:45:38.586478Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:45:38.585512Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:45:38.592421Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:45:38.591015Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:45:38.586445Z&quot;}" data-tags="[]" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>df_dummy.reset_index(inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:47:07.474397Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:47:07.473854Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:47:07.480094Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:47:07.479229Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:47:07.474363Z&quot;}" data-tags="[]" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>df_dummy.rename({<span class="st">'index'</span>: <span class="st">'id'</span>}, axis<span class="op">=</span><span class="dv">1</span>, inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:47:08.043036Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:47:08.042642Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:47:08.057182Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:47:08.055700Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:47:08.043003Z&quot;}" data-tags="[]" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>df_dummy.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="52">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>id</th>
+      <th>hours_to_discharge</th>
+      <th>department</th>
+      <th>age</th>
+      <th>pulse</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>42.0</td>
+      <td>UCH T11 NORTH (T11N)</td>
+      <td>60.0</td>
+      <td>59.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>NaN</td>
+      <td>UCH T03 INTENSIVE CARE</td>
+      <td>65.0</td>
+      <td>102.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>132.0</td>
+      <td>UCH T13 NORTH ONCOLOGY</td>
+      <td>60.0</td>
+      <td>72.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>206.0</td>
+      <td>UCH T01 ACUTE MEDICAL</td>
+      <td>10.0</td>
+      <td>60.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>90.0</td>
+      <td>UCH T11 SOUTH (T11S)</td>
+      <td>65.0</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Write dummy data out. Use sqlite to manage typing etc.</p>
+<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2022-09-11T22:53:09.508470Z&quot;,&quot;iopub.status.busy&quot;:&quot;2022-09-11T22:53:09.507276Z&quot;,&quot;iopub.status.idle&quot;:&quot;2022-09-11T22:53:09.545485Z&quot;,&quot;shell.execute_reply&quot;:&quot;2022-09-11T22:53:09.544609Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2022-09-11T22:53:09.508432Z&quot;}" data-tags="[]" data-execution_count="57">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>sqlite_engine <span class="op">=</span> sa.create_engine(<span class="st">'sqlite:///data/dummy.db'</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>df_dummy.to_sql(<span class="st">'discharges'</span>, con<span class="op">=</span>sqlite_engine, if_exists<span class="op">=</span><span class="st">'replace'</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
