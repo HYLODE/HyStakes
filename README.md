@@ -18,7 +18,7 @@ direnv allow
 ### Development work
 
 - Open VSCode in the hystakes directory
-- You may(?) need to specify the Python kernel. This should be the one from the *hystakes* conda environment.
+- You may(?) need to specify the Python kernel. This should be the one from the *hystakes* conda environment. To do this on Mac, type command-shift-P to bring up VSCode's command palette, then search for Python Interpreter, then pick the HyStakes interpreter from the dropdown list of options. 
 - Navigate to the example files and confirm that they render correctly by following the [Quarto instructions for VSCode](https://quarto.org/docs/get-started/hello/vscode.html)
 
 
