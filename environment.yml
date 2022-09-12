@@ -17,6 +17,7 @@ dependencies:
   - pytest
   - python=3.9
   - requests=2.27.1
+  - scipy
   - toml
   # pip only (non conda libs here)
   - pip:
