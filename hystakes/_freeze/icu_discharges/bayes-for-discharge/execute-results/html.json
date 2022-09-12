@@ -1,0 +1,11 @@
+{
+  "hash": "9ca840ace288b052072d41e48a7ccf87",
+  "result": {
+    "markdown": "---\ntitle: Predicting discharge using Bayesian statistics\nformat:\n  html:\n    code-fold: true\n---\n\nOur goal is to develop a Bayesian model to predict a patient's probability of being discharged in the next 24 hours. \n\nNote that, for now in this first attempt, I'm assuming you have some prior knowledge of Bayesian statistics. \n\nHere are three initial steps I think we need to do: \n\n 1. Decide on our \"prior\" probability and express it as a distribution \n 2. Identify some data we can use for the \"likelihood\". This can be synthetic to start with\n 3. Develop a posterior distribution from the prior and likelihood. \n\n1. Prior probability\n\nWe expressed the probability of discharge as \\theta.  Our prior belief about \\theta could be that it follows a beta distribution which is expressed as follows:\n\n$$\n\\theta = Beta(\\alpha,\\beta)\n$$ {#eq-prior}\n\nLet's say we know that 5% of patients are discharged on any given day. Therefore we'd like the expected value of our Beta distribution to be at 0.05. The expected value of a Beta distribution is given by\n\n$$\nExp(\\theta) = \\frac{\\alpha}{\\alpha + \\beta}\n$$\n\nSo if we set \\alpha to be 1 and \\beta to be 19, we'll get an expected value of 0.05\n\n$$\n\\theta = Beta(1,19)\n$$ {#eq-prior2}\n\nPlotting this: \n\n::: {.cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom scipy.stats import beta\n\n\na, b = 2, 38\nfig, ax = plt.subplots(1, 1)\n\nx = np.linspace(beta.ppf(0.01, a, b),\n                beta.ppf(0.99, a, b), 100)\nax.plot(x, beta.pdf(x, a, b),\n       'r-', lw=5, alpha=0.6, label='beta pdf')\n\nplt.show()\n```\n\n::: {.cell-output .cell-output-display}\n![Prior distribution](bayes-for-discharge_files/figure-html/prior-output-1.png){#prior width=566 height=411}\n:::\n:::\n\n\n",
+    "supporting": [
+      "bayes-for-discharge_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
