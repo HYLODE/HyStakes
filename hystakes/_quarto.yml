@@ -3,6 +3,8 @@ project:
   render:
     - "!scratch/"
     - "vignettes/*.ipynb"
+    - "icu_discharges/*.ipynb"
+    - "icu_discharges/*.qmd"
     - "*.qmd"
     - "*.md"
     - "*.ipynb"
@@ -19,6 +21,12 @@ website:
       - href: vignettes/vignettes.qmd
         text: Vignettes
       - about.qmd
+  sidebar:
+    style: "docked"
+    contents:
+      - section: "ICU discharges"
+        contents:
+          - icu_discharges/bayes-for-discharge.qmd
   repo-url: https://github.com/hylode/hystakes
   repo-actions: [edit, issue]
   repo-subdir: hystakes
