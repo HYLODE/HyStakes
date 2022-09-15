@@ -16,12 +16,12 @@ Here are three initial steps I think we need to do:
  2. Identify some data we can use for the "likelihood". This can be synthetic to start with
  3. Develop a posterior distribution from the prior and likelihood. 
 
-1. Prior probability
+# 1. Prior probability
 
-We expressed the probability of discharge as \theta.  Our prior belief about \theta could be that it follows a beta distribution which is expressed as follows:
+We expressed the probability of discharge as $\theta$. Our prior belief about $\theta$ could be that it follows a beta distribution which is expressed as follows:
 
 $$
-\theta = Beta(\alpha,\beta)
+P(\theta) = Beta(\alpha,\beta)
 $$ {#eq-prior}
 
 Let's say we know that 5% of patients are discharged on any given day. Therefore we'd like the expected value of our Beta distribution to be at 0.05. The expected value of a Beta distribution is given by
@@ -50,10 +50,94 @@ from scipy.stats import beta
 a, b = 2, 38
 fig, ax = plt.subplots(1, 1)
 
-x = np.linspace(beta.ppf(0.01, a, b),
-                beta.ppf(0.99, a, b), 100)
+#x = np.linspace(beta.ppf(0.01, a, b), beta.ppf(0.99, a, b), 100)
+x = np.linspace(0, 1, 100)
 ax.plot(x, beta.pdf(x, a, b),
-       'r-', lw=5, alpha=0.6, label='beta pdf')
+       'r-', lw=2, alpha=0.6, label='beta pdf')
+plt.xlim([0, 1])
 
 plt.show()
 ```
+
+# 2. Identify some data we can use for the "likelihood"
+
+Now let's look at some data. This will constitute our likelihood. First let's read it in from a saved anonymised database
+```{python}
+import sqlalchemy as sa
+import pandas as pd
+import os
+
+#os.chdir('/Users/zellaking/Repos/HyStakes/hystakes/icu_discharges')
+
+# achieved this only by changing directory
+sqlite_engine = sa.create_engine('sqlite:///../../data/dummy.db')
+
+#df = pd.read_sql_table(    'discharges', con=sqlite_engine)
+
+df = pd.read_sql_query("SELECT * from discharges", sqlite_engine)
+df.head()
+
+# Let N be the number of patients observed
+N = df.shape[0]
+
+# Let X be the number of patients who were discharged in 24 hours
+X = df[df.hours_to_discharge <= 24].shape[0]
+print("Number of people discharged in 24 hours: " + str(X))
+print("Total number of people observed: " + str(N))
+
+```
+We observe that X patients out of N were discharged. This provides our likelihood. We can express our data as a binomial distribution as follows where we do N trials with an our unknown probability $\theta$
+
+$$
+P(data) = Binomial(N, \theta)
+$$ {#eq-likelihood}
+
+The binomial distribution can be expanded as shown here, where ${N \choose X}$ is the notation for N Choose X (a way of expressing the number of different ways, or permutations, that you could get a result of X discharged patients when starting with N patients in total) 
+
+$$
+P(data) = {N \choose X} \theta^x(1-\theta)^{(N-X)}
+$$
+
+# 3. Develop a posterior distribution from the prior and likelihood
+
+We know from Bayesian statistics that, if you have a beta prior, and binomial likelihood then you can derive the posterior distribution from these two without doing any complicated maths. 
+
+Specifically, our posterior can be expressed as a beta distribution, in which we can bring in the values of \theta from our prior, and values of N and X from our likelihood
+
+$$
+P(\theta | data) = Beta(\alpha + X,N + \beta - X)
+$$
+
+And this can also be expressed like this
+
+$$
+P(\theta | data) = \frac{\theta^{(\alpha + X -1)}(1 - \theta)^{N + \beta - X -1}}{B (\alpha + X -1, N + \beta - X -1)}
+$$
+ The denominator above is referred to as a normalising constant. It looks confusing, but the key thing to note that it doesn't contain any values of $\theta$ making it simpler to work out than when you have to integrate over all values of \theta. 
+
+ We can now draw our posterior distribution (in blue) 
+
+```{python}
+#| label: posterior
+#| fig-cap: "Posterior distribution"
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import beta
+
+
+a_prime, b_prime = 2 + X , 38 + N - X
+fig, ax = plt.subplots(1, 1)
+
+
+line1, = ax.plot(x, beta.pdf(x, a, b),
+       'r-', lw=2, alpha=0.6, label='prior')
+line2, = ax.plot(x, beta.pdf(x, a_prime, b_prime),
+       'b-', lw=2, alpha=0.6, label='posterior')
+ax.legend(handles=[line1, line2])
+
+
+plt.show()
+```
+
+Now that we have seen the data, we see that our original prior was too negative. More patients are discharged each day than we expected. The probability is in a tighter range (a taller, slimmer peak), because we have observed {{N}} or md(f"{n}) patients.  
