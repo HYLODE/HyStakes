@@ -2,30 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://github.com/HYLODE/HyStakes/vignettes/hello-world.html</loc>
-    <lastmod>2022-09-12T21:01:07.327Z</lastmod>
+    <lastmod>2022-09-20T21:13:47.362Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyStakes/vignettes/prepare-synthetic-data.html</loc>
-    <lastmod>2022-09-12T21:01:08.363Z</lastmod>
+    <lastmod>2022-09-20T21:13:48.222Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyStakes/vignettes/uclh-working-with-star.html</loc>
-    <lastmod>2022-09-12T21:01:08.859Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyStakes/icu_discharges/bayes-for-discharge.html</loc>
-    <lastmod>2022-09-12T21:01:09.367Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyStakes/about.html</loc>
-    <lastmod>2022-09-12T21:01:09.719Z</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/HYLODE/HyStakes/index.html</loc>
-    <lastmod>2022-09-12T21:01:10.063Z</lastmod>
+    <lastmod>2022-09-20T21:13:48.638Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/HYLODE/HyStakes/vignettes/vignettes.html</loc>
-    <lastmod>2022-09-12T21:01:10.439Z</lastmod>
+    <lastmod>2022-09-20T21:13:49.018Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyStakes/tutorial/bayes-for-discharge.html</loc>
+    <lastmod>2022-09-20T21:13:49.506Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyStakes/about.html</loc>
+    <lastmod>2022-09-20T21:13:49.782Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/HYLODE/HyStakes/index.html</loc>
+    <lastmod>2022-09-20T21:13:50.054Z</lastmod>
   </url>
 </urlset>
