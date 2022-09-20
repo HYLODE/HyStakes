@@ -50,7 +50,6 @@ from scipy.stats import beta
 a, b = 2, 38
 fig, ax = plt.subplots(1, 1)
 
-#x = np.linspace(beta.ppf(0.01, a, b), beta.ppf(0.99, a, b), 100)
 theta = np.linspace(0, 1, 100)
 ax.plot(theta, beta.pdf(theta, a, b),
        'r-', lw=2, alpha=0.6, label='beta pdf')
@@ -70,7 +69,6 @@ import sqlalchemy as sa
 import pandas as pd
 import os
 
-#os.chdir('/Users/zellaking/Repos/HyStakes/hystakes/icu_discharges')
 
 # achieved this only by changing directory
 sqlite_engine = sa.create_engine('sqlite:///../../data/dummy.db')
