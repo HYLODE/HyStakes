@@ -4,7 +4,9 @@
     "items": [
       "/vignettes/hello-world.html",
       "/vignettes/prepare-synthetic-data.html",
-      "/vignettes/uclh-working-with-star.html"
+      "/vignettes/uclh-working-with-star.html",
+      "/vignettes/how-to-count.html",
+      "/vignettes/learn-stats-pandemic.html"
     ]
   }
 ]
