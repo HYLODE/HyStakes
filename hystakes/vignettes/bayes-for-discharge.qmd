@@ -70,11 +70,7 @@ import pandas as pd
 import os
 
 
-# achieved this only by changing directory
 sqlite_engine = sa.create_engine('sqlite:///../../data/dummy.db')
-
-#df = pd.read_sql_table(    'discharges', con=sqlite_engine)
-
 df = pd.read_sql_query("SELECT * from discharges", sqlite_engine)
 df.head()
 
