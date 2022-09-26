@@ -22,6 +22,10 @@ website:
       - href: vignettes/vignettes.qmd
         text: Vignettes
       - about.qmd
+    right:
+      - icon: github
+        href: https://github.com/HYLODE/HyStakes
+        aria-label: GitHub
   sidebar:
     style: "docked"
     contents:
