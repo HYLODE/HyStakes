@@ -8,6 +8,7 @@ channels:
 dependencies:
   - arrow=1.2.2
   - jupyterlab
+  - jupyter_contrib_nbextensions
   - matplotlib
   - numpy>=1.22.3
   - orjson
@@ -19,6 +20,7 @@ dependencies:
   - requests=2.27.1
   - scipy
   - sqlalchemy
+  - statsmodels
   - toml
   # pip only (non conda libs here)
   - pip:
