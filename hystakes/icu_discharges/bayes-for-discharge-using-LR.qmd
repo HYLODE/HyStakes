@@ -179,10 +179,3 @@ plt.show()
 ```
 
 The posterior predictive distribution is in a tighter range (a taller, slimmer peak) than the prior predictive distribution, and is overwhelmingly determined by the data, rather than the prior. This is the case with Bayesian statistics: as you get more data, the prior beliefs become less important.  
-
-Let's observe the most probable value of theta, ie the most likely probability of discharge in the next 24 hours, taking into account no other factors
-
-```{python}
-
-print(theta[beta.pdf(theta, a_prime, b_prime).argmax()])
-```
