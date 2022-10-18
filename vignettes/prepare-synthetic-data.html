@@ -792,6 +792,12 @@ Name: pulse, Length: 444, dtype: float64</code></pre>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>sqlite_engine <span class="op">=</span> sa.create_engine(<span class="st">'sqlite:///data/dummy.db'</span>)</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>df_dummy.to_sql(<span class="st">'discharges'</span>, con<span class="op">=</span>sqlite_engine, if_exists<span class="op">=</span><span class="st">'replace'</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Now demonstrate that you can use those data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remember `///` for sqlite file paths</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>engine <span class="op">=</span> sa.create_engine(<span class="st">'sqlite:///../../data/dummy.db'</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_sql(<span class="st">'select * from discharges'</span>, engine)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
 </section>
