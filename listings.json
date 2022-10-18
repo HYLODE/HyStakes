@@ -4,7 +4,10 @@
     "items": [
       "/vignettes/hello-world.html",
       "/vignettes/prepare-synthetic-data.html",
+      "/vignettes/pymc-setup.html",
+      "/vignettes/think-bayes-ch8.html",
       "/vignettes/uclh-working-with-star.html",
+      "/vignettes/estimate-discharges.html",
       "/vignettes/how-to-count.html",
       "/vignettes/learn-stats-pandemic.html"
     ]
