@@ -6,6 +6,18 @@ https://towardsdatascience.com/introduction-to-pymc3-a-python-package-for-probab
 
 and installed version 4 via
 https://github.com/pymc-devs/pymc3
+and got the local example working
+https://www.pymc.io/projects/docs/en/latest/learn/core_notebooks/pymc_overview.html
+
+maybe **resume** here
+https://docs.pymc.io/en/v3/pymc-examples/examples/generalized_linear_models/GLM-logistic.html
+https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-binomial-regression.html
+https://goldinlocks.github.io/Bayesian-logistic-regression-with-pymc3/
+https://www.srose.biz/bayesian-methods/bayesian-logistic-regression-with-pymc3/
+https://towardsdatascience.com/bayesian-logistic-regression-with-pymc3-8e17c576f31a
+https://towardsdatascience.com/introduction-to-pymc3-a-python-package-for-probabilistic-programming-5299278b428
+
+https://pymc-learn.readthedocs.io/en/latest/index.html
 
 ## 2022-10-17
 trying to work with PyMC3
